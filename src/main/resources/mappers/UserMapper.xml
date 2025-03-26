@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.demo.mapper.UserMapper">
+    <insert id="createUser" parameterType="com.example.demo.dto.request.CreateUserRequest" useGeneratedKeys="true">
+        INSERT INTO user (name, email, password)
+        values (#{name}, #{email}, #{password});
+    </insert>
+    <update id="updateUser" parameterType="com.example.demo.dto.request.UpdateUserRequest">
+        UPDATE user
+        SET name = #{name}, email = #{email}, password = #{password},
+            avatar = #{avatar}, description = #{description}, status = #{status}
+        WHERE user_id = #{userId} AND (delete_flg = 0)
+    </update>
+    <update id="deleteUser">
+        UPDATE user
+        SET delete_flg = 1
+        WHERE user_id = #{userId}
+    </update>
+    <select id="getUserById" resultType="com.example.demo.dto.response.UserResponse">
+        SELECT user_id, name, email, avatar, description, status, created_at
+        FROM user
+        WHERE user_id = #{userId}
+    </select>
+    <select id="getUserByEmail" resultType="com.example.demo.dto.response.UserResponse">
+        SELECT user_id, name, email, avatar, description, status, created_at
+        FROM user
+        WHERE user_id = #{email}
+    </select>
+    <select id="existByEmail" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM user
+        WHERE email = #{email}
+    </select>
+</mapper>
