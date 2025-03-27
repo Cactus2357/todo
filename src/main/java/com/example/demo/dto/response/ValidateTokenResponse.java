@@ -1,15 +1,16 @@
-package com.example.demo.dto.request;
+package com.example.demo.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreateUserRequest {
-    String name;
-    String email;
-    String password;
+public class ValidateTokenResponse {
+    boolean valid;
+    Date expiry;
 }

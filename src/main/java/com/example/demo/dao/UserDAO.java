@@ -2,9 +2,12 @@ package com.example.demo.dao;
 
 import com.example.demo.dto.request.CreateUserRequest;
 import com.example.demo.dto.request.UpdateUserRequest;
-import com.example.demo.dto.response.UserResponse;
 import com.example.demo.mapper.UserMapper;
+import com.example.demo.model.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public class UserDAO {
@@ -14,19 +17,23 @@ public class UserDAO {
         this.userMapper = userMapper;
     }
 
-    public int createUser(CreateUserRequest request) {
+    public List<User> findAll() {
+        return userMapper.getAllUsers();
+    }
+
+    public int createUser(User request) {
         return userMapper.createUser(request);
     }
 
-    public UserResponse getUserById(int userId) {
+    public User getUserById(int userId) {
         return userMapper.getUserById(userId);
     }
 
-    public UserResponse getUserByEmail(String email) {
+    public User getUserByEmail(String email) {
         return userMapper.getUserByEmail(email);
     }
 
-    public int updateUser(UpdateUserRequest request) {
+    public int updateUser(User request) {
         return userMapper.updateUser(request);
     }
 

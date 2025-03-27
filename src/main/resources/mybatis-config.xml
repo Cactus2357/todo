@@ -5,10 +5,10 @@
         <setting name="jdbcTypeForNull" value="NULL"/>
         <setting name="autoMappingBehavior" value="FULL"/>
         <setting name="callSettersOnNulls" value="true"/>
-        <setting name="mapUnderScoreToCamelCase" value="true"/>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
     </settings>
 
-<!--    <typeAliases>-->
-<!--        <package name="com.example.demo.mapper"/>-->
-<!--    </typeAliases>-->
+    <typeAliases>
+        <package name="com.example.demo.mapper"/>
+    </typeAliases>
 </configuration>

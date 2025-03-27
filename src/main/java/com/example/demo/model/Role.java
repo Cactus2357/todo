@@ -1,13 +1,11 @@
 package com.example.demo.model;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -16,9 +14,9 @@ public class Role {
     String roleName;
     int status;
     LocalDateTime createdAt;
-    int createdBy;
+    String createdBy;
     LocalDateTime updatedAt;
-    int updatedBy;
+    String updatedBy;
 }
 
 //role_id INT AUTO_INCREMENT PRIMARY KEY,

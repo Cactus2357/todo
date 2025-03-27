@@ -15,11 +15,15 @@ spring:
 
 ###
 mybatis:
-  config-location: classpath:mybatis-config.xml
+#  config-location: classpath:mybatis-config.xml
   mapper-locations: classpath:mappers/*.xml
   type-aliases-package: com.example.demo.model
   configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    jdbc-type-for-null: null
+    auto-mapping-behavior: full
+    call-setters-on-nulls: true
+    map-underscore-to-camel-case: true
+
 
 ###
 jwt:

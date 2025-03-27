@@ -1,14 +1,21 @@
 package com.example.demo.mapper;
 
-import com.example.demo.dto.request.CreateUserRequest;
-import com.example.demo.dto.request.UpdateUserRequest;
-import com.example.demo.dto.response.UserResponse;
+import com.example.demo.model.User;
+
+import java.util.List;
 
 public interface UserMapper {
-    int createUser(CreateUserRequest params);
-    UserResponse getUserById(Integer userId);
-    UserResponse getUserByEmail(String email);
-    int updateUser(UpdateUserRequest params);
+    List<User> getAllUsers();
+
+    int createUser(User user);
+
+    User getUserById(Integer userId);
+
+    User getUserByEmail(String email);
+
+    int updateUser(User user);
+
     int deleteUser(Integer userId);
+
     int existByEmail(String email);
 }
