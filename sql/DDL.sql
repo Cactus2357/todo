@@ -109,6 +109,14 @@ create table status (
     updated_by VARCHAR(255)
 );
 
+create table invalidated_token (
+	jit_id int auto_increment primary key,
+    jit varchar(255),
+    expiry DATETIME
+);
+
+CREATE INDEX idx_token_value ON invalidated_token (jit);
+
 create table setting (
     setting_id int auto_increment primary key,
     setting_name varchar(100) not null,
