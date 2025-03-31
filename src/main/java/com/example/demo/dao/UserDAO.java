@@ -1,10 +1,7 @@
 package com.example.demo.dao;
 
-import com.example.demo.dto.request.CreateUserRequest;
-import com.example.demo.dto.request.UpdateUserRequest;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.model.User;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,8 +18,8 @@ public class UserDAO {
         return userMapper.getAllUsers();
     }
 
-    public int createUser(User request) {
-        return userMapper.createUser(request);
+    public int createUser(User user) {
+        return userMapper.createUser(user);
     }
 
     public User getUserById(int userId) {
@@ -33,15 +30,19 @@ public class UserDAO {
         return userMapper.getUserByEmail(email);
     }
 
-    public int updateUser(User request) {
-        return userMapper.updateUser(request);
+    public User getUserByUsername(String username) {
+        return userMapper.getUserByUsername(username);
+    }
+
+    public int updateUser(User user) {
+        return userMapper.updateUser(user);
     }
 
     public int deleteUser(int userId) {
         return userMapper.deleteUser(userId);
     }
 
-    public boolean existUser(String email) {
-        return userMapper.existByEmail(email) > 0;
+    public boolean existUser(String username, String email) {
+        return userMapper.countByUsernameAndEmail(username, email) > 0;
     }
 }

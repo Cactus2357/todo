@@ -3,15 +3,21 @@ package com.example.demo.service;
 import com.example.demo.dao.RoleDAO;
 import com.example.demo.dao.UserDAO;
 import com.example.demo.dto.request.CreateUserRequest;
+import com.example.demo.dto.request.UpdateUserRequest;
 import com.example.demo.dto.response.UserResponse;
 import com.example.demo.enums.RoleEnum;
 import com.example.demo.exception.AppException;
 import com.example.demo.exception.ErrorCode;
+import com.example.demo.mapper.UserMapper;
 import com.example.demo.model.User;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,12 +39,14 @@ public class UserService {
 
     @Transactional
     public UserResponse createUser(CreateUserRequest request) {
-        User user = toUser(request);
 
-        boolean userExisted = userDAO.existUser(request.getEmail());
+        boolean userExisted = userDAO.existUser(request.getUsername(), request.getUsername());
+
         if (userExisted) {
             throw new AppException(ErrorCode.USER_EXISTED);
         }
+
+        User user = toUser(request);
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
@@ -63,15 +71,69 @@ public class UserService {
         return userList.stream().map(this::toUserResponse).toList();
     }
 
+    public UserResponse getCurrentUser() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        String username = context.getAuthentication().getName();
+
+        User user = userDAO.getUserByUsername(username);
+
+        if (user == null) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        return toUserResponse(user);
+    }
+
+    @Transactional
+    @PostAuthorize("returnObject.username == authentication.name")
+    public UserResponse updateUser(int userId, UpdateUserRequest request) {
+
+        User user = toUser(request);
+        user.setUserId(userId);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        userDAO.updateUser(user);
+
+        return getUserById(user.getUserId());
+    }
+
+    @PreAuthorize("hasRole('admin')")
+    public int deleteUser(int userId) {
+        return userDAO.deleteUser(userId);
+    }
+
     private User toUser(@NonNull CreateUserRequest request) {
         User user = new User();
-        user.setName(request.getName());
+        user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
+        user.setDisplayName(request.getDisplayName());
+        return user;
+    }
+
+    private User toUser(@NonNull UpdateUserRequest request) {
+        User user = new User();
+        user.setUserId(request.getUserId());
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+        user.setDisplayName(request.getDisplayName());
+        user.setAvatar(request.getAvatar());
+        user.setDescription(request.getDescription());
+        user.setStatus(request.getStatus());
         return user;
     }
 
     private UserResponse toUserResponse(@NonNull User user) {
-        return new UserResponse(user.getUserId(), user.getName(), user.getEmail(), user.getAvatar(), user.getDescription(), user.getStatus(), user.getCreatedAt());
+        return new UserResponse(
+                user.getUserId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getDisplayName(),
+                user.getAvatar(),
+                user.getDescription(),
+                user.getStatus(),
+                user.getCreatedAt()
+        );
     }
 }

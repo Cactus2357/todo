@@ -7,6 +7,10 @@
             (#{userId}, #{roleId})
         </foreach>
     </insert>
+    <insert id="insertRole">
+        INSERT INTO role (role_name, status)
+            VALUE (#{roleName}, 8)
+    </insert>
     <delete id="deleteUserRole">
         DELETE FROM user_role WHERE user_id = #{userId};
     </delete>

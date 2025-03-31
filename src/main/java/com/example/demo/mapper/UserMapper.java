@@ -11,11 +11,19 @@ public interface UserMapper {
 
     User getUserById(Integer userId);
 
+    User getUserByUsername(String username);
+
     User getUserByEmail(String email);
+
 
     int updateUser(User user);
 
     int deleteUser(Integer userId);
 
-    int existByEmail(String email);
+    int countByUsername(String username);
+
+    int countByEmail(String email);
+
+    int countByUsernameAndEmail(String username, String email);
+
 }

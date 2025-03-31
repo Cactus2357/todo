@@ -2,6 +2,7 @@ package com.example.demo.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -9,22 +10,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Role {
-    int roleId;
-    String roleName;
-    int status;
-    LocalDateTime createdAt;
-    String createdBy;
-    LocalDateTime updatedAt;
-    String updatedBy;
+public class InvalidatedToken {
+    int tokenId;
+    String jit;
+    LocalDateTime expiry;
 }
 
-//role_id INT AUTO_INCREMENT PRIMARY KEY,
-//role_name VARCHAR(100) unique not null,
-//status INT,
-//delete_flg INT DEFAULT 0,
-//created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-//created_by VARCHAR(255),
-//updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-//updated_by VARCHAR(255)
+//token_id int auto_increment primary key,
+//token_value varchar(255),
+//expiry DATETIME
 
