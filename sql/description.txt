@@ -1,0 +1,30 @@
+Task
+# user (user_id, name, email, password, avatar_url, brief, status, note)
+# role (role_id, name, description, note)
+
+# task (task_id, name, description, start_date, end_date, status)
+
+# group (group_id, name, description, status, created_at, created_by)
+# group_user (group_id, user_id, user_role, joined_at, status)
+# user_task (task_id, user_id)
+# task_relation (parent_tag_id, task_id)
+
+# setting (setting_id, name, value, type, description, status, note)
+
+# status [
+    user: (inactive, active, pending, banned, deleted, suspended),
+    role: (inactive, active, pending, deprecated, deleted),
+    group: (inactive, active, archived, pending, banned, deleted),
+    user_group: (inactive, active, pending, banned, left, archived),
+    task: (pending, in_progress, completed, pending, canceled, archived),
+    setting: (inactive, active, pending, deprecated, archived, deleted)
+]
+
+---
+FORUM
+
+---
+CONTROL ACCESS
+# link (link_id, type, url, status, note)
+# link_detail (link_id, description)
+# link_role (role_id, link_id, status, note)

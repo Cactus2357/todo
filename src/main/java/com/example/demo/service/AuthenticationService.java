@@ -1,13 +1,15 @@
 package com.example.demo.service;
 
+import com.example.demo.dao.InvalidatedTokenDAO;
 import com.example.demo.dao.RoleDAO;
 import com.example.demo.dao.UserDAO;
 import com.example.demo.dto.request.AuthenticationRequest;
-import com.example.demo.dto.request.ValidateTokenRequest;
+import com.example.demo.dto.request.TokenRequest;
 import com.example.demo.dto.response.AuthenticationResponse;
 import com.example.demo.dto.response.ValidateTokenResponse;
 import com.example.demo.exception.AppException;
 import com.example.demo.exception.ErrorCode;
+import com.example.demo.model.InvalidatedToken;
 import com.example.demo.model.Role;
 import com.example.demo.model.User;
 import com.nimbusds.jose.*;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
@@ -35,7 +38,7 @@ public class AuthenticationService {
 
     private final UserDAO userDAO;
     private final RoleDAO roleDAO;
-
+    private final InvalidatedTokenDAO invalidatedTokenDAO;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -47,13 +50,18 @@ public class AuthenticationService {
     @Value("${jwt.valid-duration}")
     protected long VALID_DURATION;
 
-    public AuthenticationService(UserDAO userDAO, RoleDAO roleDAO, PasswordEncoder passwordEncoder) {
+    @NonFinal
+    @Value("${jwt.refreshable-duration}")
+    protected long REFRESHABLE_DURATION;
+
+    public AuthenticationService(UserDAO userDAO, RoleDAO roleDAO, InvalidatedTokenDAO invalidatedTokenDAO, PasswordEncoder passwordEncoder) {
         this.userDAO = userDAO;
         this.roleDAO = roleDAO;
+        this.invalidatedTokenDAO = invalidatedTokenDAO;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public ValidateTokenResponse validateToken(ValidateTokenRequest request) {
+    public ValidateTokenResponse validateToken(TokenRequest request) {
         String token = request.getToken();
         boolean isValid = false;
         Date expiry = null;
@@ -63,9 +71,54 @@ public class AuthenticationService {
 
             isValid = true;
             expiry = signedJWT.getJWTClaimsSet().getExpirationTime();
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            log.info("Token is invalid");
+        }
 
         return ValidateTokenResponse.builder().valid(isValid).expiry(expiry).build();
+    }
+
+    private void invalidateToken(SignedJWT signedJWT) throws ParseException {
+        String jit = signedJWT.getJWTClaimsSet().getJWTID();
+        Date expiry = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+        InvalidatedToken token = InvalidatedToken.builder()
+                .jit(jit)
+                .expiry(expiry.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())
+                .build();
+
+        if (invalidatedTokenDAO.isInvalidated(jit))
+            return;
+
+        invalidatedTokenDAO.invalidateToken(token);
+    }
+
+    public void logout(TokenRequest request) throws ParseException, JOSEException {
+        try {
+            SignedJWT signedJWT = verifyToken(request.getToken(), true);
+
+            invalidateToken(signedJWT);
+        } catch (AppException e) {
+            log.info("Token is already expired.");
+        }
+    }
+
+    public AuthenticationResponse refreshToken(TokenRequest request) throws ParseException, JOSEException {
+        SignedJWT signedJWT = verifyToken(request.getToken(), true);
+
+        invalidateToken(signedJWT);
+
+        String username = signedJWT.getJWTClaimsSet().getSubject();
+
+        User user = userDAO.getUserByUsername(username);
+
+        if (user == null) {
+            throw new AppException(ErrorCode.UNCATEGORIZED);
+        }
+
+        String token = generateToken(user);
+
+        return AuthenticationResponse.builder().token(token).authenticated(true).build();
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -90,7 +143,7 @@ public class AuthenticationService {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getEmail())
+                .subject(user.getUsername())
                 .issuer("demo.example.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(
@@ -118,12 +171,19 @@ public class AuthenticationService {
 
         SignedJWT signedJWT = SignedJWT.parse(token);
 
-        Date expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+        Date expiryTime = isRefresh
+                ? Date.from(signedJWT.getJWTClaimsSet().getIssueTime().toInstant().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS))
+                : signedJWT.getJWTClaimsSet().getExpirationTime();
 
         boolean verified = signedJWT.verify(verifier);
 
-        if (!(verified && expiryTime.after(new Date()))) {
+
+        if (!(verified && expiryTime.toInstant().isAfter(Instant.now()))) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+
+        if (invalidatedTokenDAO.isInvalidated(signedJWT.getJWTClaimsSet().getJWTID())) {
+            throw new AppException( ErrorCode.UNAUTHENTICATED);
         }
 
         return signedJWT;
