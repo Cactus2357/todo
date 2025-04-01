@@ -11,12 +11,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class InvalidatedToken {
-    int tokenId;
+    int jitId;
     String jit;
     LocalDateTime expiry;
 }
 
-//token_id int auto_increment primary key,
-//token_value varchar(255),
+//jit_id int auto_increment primary key,
+//jit varchar(255),
 //expiry DATETIME
 
