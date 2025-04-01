@@ -18,6 +18,8 @@ public class User {
     String avatar;
     String description;
     int status;
+    String note;
+    int deleteFlg;
     LocalDateTime createdAt;
     String createdBy;
     LocalDateTime updatedAt;
