@@ -13,6 +13,7 @@ public class Role {
     int roleId;
     String roleName;
     int status;
+    int deleteFlg;
     LocalDateTime createdAt;
     String createdBy;
     LocalDateTime updatedAt;
