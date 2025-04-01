@@ -10,12 +10,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Task {
-    int taskId;
-    int parentTaskId;
-    String title;
-    String content;
-    LocalDateTime startDate;
-    LocalDateTime endDate;
-    int status;
+public class Status {
+    int statusId;
+    String statusType;
+    String statusName;
+    String description;
 }

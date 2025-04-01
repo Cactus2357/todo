@@ -1,4 +1,4 @@
-package com.example.demo.dto.request.task;
+package com.example.demo.dto.response.task;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpdateTaskRequest {
+public class TaskResponse {
     int taskId;
     int parentTaskId;
     String title;
