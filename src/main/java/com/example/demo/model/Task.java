@@ -19,6 +19,7 @@ public class Task {
     LocalDateTime endDate;
     int status;
     String note;
+    int deleteFlg;
     LocalDateTime createdAt;
     String createdBy;
     LocalDateTime updatedAt;

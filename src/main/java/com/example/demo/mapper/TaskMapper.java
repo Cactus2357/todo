@@ -1,19 +1,20 @@
 package com.example.demo.mapper;
 
 import com.example.demo.model.Task;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 public interface TaskMapper {
-    List<Task> getAllTasksByUserId(int userId);
+    List<Task> getAllTasksByUserId(@Param("userId") int userId);
 
-    Task getTaskById(int userId, int taskId);
+    Task getTaskById(@Param("taskId") int taskId, @Param("userId") int userId);
 
-    int createTask(Task task);
+    int createTask(@Param("task") Task task, @Param("userId") int userId);
 
-    int updateTask(Task task);
+    int updateTask(@Param("task") Task task, @Param("userId") int userId);
 
-    int updateTaskStatus(int taskId, String status);
+    int updateTaskStatus(@Param("taskId") int taskId, @Param("statusId") int statusId, @Param("userId") int userId);
 
-    int deleteTask(Task task);
+    int deleteTask(@Param("taskId") int taskId, @Param("userId") int userId);
 }
