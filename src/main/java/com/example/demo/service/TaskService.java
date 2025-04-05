@@ -10,6 +10,7 @@ import com.example.demo.dto.response.UserResponse;
 import com.example.demo.enums.RoleEnum;
 import com.example.demo.exception.AppException;
 import com.example.demo.exception.ErrorCode;
+import com.example.demo.model.Task;
 import com.example.demo.model.User;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -33,8 +34,19 @@ public class TaskService {
         this.taskDAO = taskDAO;
     }
 
-    public void createTask(CreateTaskRequest createTaskRequest) {
+    public void createTask(CreateTaskRequest request) {
 
+        taskDAO.createTask(toTask(request), 0);
+    }
+
+    private Task toTask(CreateTaskRequest request) {
+        Task task = new Task();
+        task.setTitle(request.getTitle());
+        task.setContent(request.getContent());
+        task.setParentTaskId(request.getParentTaskId());
+        task.setStartDate(request.getStartDate());
+        task.setEndDate(request.getEndDate());
+        return task;
     }
 
 
