@@ -183,7 +183,7 @@ public class AuthenticationService {
         }
 
         if (invalidatedTokenDAO.isInvalidated(signedJWT.getJWTClaimsSet().getJWTID())) {
-            throw new AppException( ErrorCode.UNAUTHENTICATED);
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
         return signedJWT;
