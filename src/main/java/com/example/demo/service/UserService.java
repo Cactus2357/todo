@@ -8,12 +8,11 @@ import com.example.demo.dto.response.UserResponse;
 import com.example.demo.enums.RoleEnum;
 import com.example.demo.exception.AppException;
 import com.example.demo.exception.ErrorCode;
-import com.example.demo.mapper.UserMapper;
 import com.example.demo.model.User;
 import lombok.AccessLevel;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContext;
@@ -26,6 +25,7 @@ import java.util.List;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class UserService {
     UserDAO userDAO;
     RoleDAO roleDAO;
@@ -73,9 +73,18 @@ public class UserService {
 
     public UserResponse getCurrentUser() {
         SecurityContext context = SecurityContextHolder.getContext();
-        String username = context.getAuthentication().getName();
+        int userId;
+        String subject = context.getAuthentication().getPrincipal().toString();
+        String sub = context.getAuthentication().getName();
 
-        User user = userDAO.getUserByUsername(username);
+        try {
+            userId = Integer.parseInt(sub);
+        } catch (Exception e) {
+            log.error("Subject: {}", sub);
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        User user = userDAO.getUserById(userId);
 
         if (user == null) {
             throw new AppException(ErrorCode.USER_NOT_FOUND);
@@ -85,7 +94,7 @@ public class UserService {
     }
 
     @Transactional
-    @PostAuthorize("returnObject.username == authentication.name")
+    @PostAuthorize("returnObject.userId == authentication.name")
     public UserResponse updateUser(int userId, UpdateUserRequest request) {
 
         User user = toUser(request);
