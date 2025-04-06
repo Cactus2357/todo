@@ -35,8 +35,11 @@ public class TaskService {
     }
 
     public void createTask(CreateTaskRequest request) {
+        SecurityContext context = SecurityContextHolder.getContext();
 
-        taskDAO.createTask(toTask(request), 0);
+        int userId = Integer.parseInt(context.getAuthentication().getName());
+
+        taskDAO.createTask(toTask(request), userId);
     }
 
     private Task toTask(CreateTaskRequest request) {

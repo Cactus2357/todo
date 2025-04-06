@@ -74,13 +74,11 @@ public class UserService {
     public UserResponse getCurrentUser() {
         SecurityContext context = SecurityContextHolder.getContext();
         int userId;
-        String subject = context.getAuthentication().getPrincipal().toString();
-        String sub = context.getAuthentication().getName();
 
         try {
+            String sub = context.getAuthentication().getName();
             userId = Integer.parseInt(sub);
         } catch (Exception e) {
-            log.error("Subject: {}", sub);
             throw new AppException(ErrorCode.USER_NOT_FOUND);
         }
 
