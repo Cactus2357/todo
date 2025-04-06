@@ -33,7 +33,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/validate")
-    ResponseEntity<ApiResponse<ValidateTokenResponse>> validate(@RequestBody TokenRequest request) {
+    ResponseEntity<ApiResponse<ValidateTokenResponse>> validate(@RequestBody TokenRequest request) throws ParseException, JOSEException {
         return ResponseEntity.ok(ApiResponse.<ValidateTokenResponse>builder().data(authenticationService.validateToken(request)).build());
     }
 

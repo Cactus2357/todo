@@ -61,7 +61,7 @@ public class AuthenticationService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public ValidateTokenResponse validateToken(TokenRequest request) {
+    public ValidateTokenResponse validateToken(TokenRequest request) throws ParseException, JOSEException {
         String token = request.getToken();
         boolean isValid = false;
         Date expiry = null;
@@ -71,7 +71,7 @@ public class AuthenticationService {
 
             isValid = true;
             expiry = signedJWT.getJWTClaimsSet().getExpirationTime();
-        } catch (Exception ignored) {
+        } catch (AppException ignored) {
             log.info("Token is invalid");
         }
 
@@ -108,9 +108,9 @@ public class AuthenticationService {
 
         invalidateToken(signedJWT);
 
-        String username = signedJWT.getJWTClaimsSet().getSubject();
+        int userId = Integer.parseInt(signedJWT.getJWTClaimsSet().getSubject());
 
-        User user = userDAO.getUserByUsername(username);
+        User user = userDAO.getUserById(userId);
 
         if (user == null) {
             throw new AppException(ErrorCode.UNCATEGORIZED);
@@ -143,7 +143,7 @@ public class AuthenticationService {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getUsername())
+                .subject(String.valueOf(user.getUserId()))
                 .issuer("demo.example.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(
