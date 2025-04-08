@@ -23,6 +23,10 @@ public class TaskDAO {
         return taskMapper.getTaskById(taskId, userId);
     }
 
+    public Task getTaskById(int taskId) {
+        return taskMapper.getTaskById(taskId, null);
+    }
+
     public int createTask(Task task, int userId) {
         task.setStatus(Const.STATUS_TASK_PROGRESS);
         return taskMapper.createTask(task, userId);
