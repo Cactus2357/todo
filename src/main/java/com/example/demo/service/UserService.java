@@ -37,6 +37,14 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    public static int getCurrentUserId() {
+        try {
+            return Integer.parseInt(SecurityContextHolder.getContext().getAuthentication().getName());
+        } catch (NumberFormatException e) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+    }
+
     @Transactional
     public UserResponse createUser(CreateUserRequest request) {
 
@@ -72,17 +80,7 @@ public class UserService {
     }
 
     public UserResponse getCurrentUser() {
-        SecurityContext context = SecurityContextHolder.getContext();
-        int userId;
-
-        try {
-            String sub = context.getAuthentication().getName();
-            userId = Integer.parseInt(sub);
-        } catch (Exception e) {
-            throw new AppException(ErrorCode.USER_NOT_FOUND);
-        }
-
-        User user = userDAO.getUserById(userId);
+        User user = userDAO.getUserById(getCurrentUserId());
 
         if (user == null) {
             throw new AppException(ErrorCode.USER_NOT_FOUND);
@@ -140,7 +138,6 @@ public class UserService {
                 user.getAvatar(),
                 user.getDescription(),
                 user.getStatus(),
-                user.getCreatedAt()
-        );
+                user.getCreatedAt());
     }
 }
