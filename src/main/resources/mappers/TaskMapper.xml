@@ -10,9 +10,11 @@
     <select id="getTaskById" resultType="com.example.demo.model.Task">
         SELECT t.task_id, t.parent_task_id, t.title, t.content, t.start_date, t.end_date, t.status
         FROM task t
-                 LEFT JOIN user_task ut on t.task_id = ut.task_id
+        LEFT JOIN user_task ut on t.task_id = ut.task_id
         WHERE t.task_id = #{taskId}
-          AND ut.user_id = #{userId}
+        <if test="userId != null">
+            AND ut.user_id = #{userId}
+        </if>
     </select>
     <insert id="createTask">
         INSERT INTO task (parent_task_id, title, content, start_date, end_date, status, created_by)

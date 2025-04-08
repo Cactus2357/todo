@@ -8,7 +8,7 @@ import java.util.List;
 public interface TaskMapper {
     List<Task> getAllTasksByUserId(@Param("userId") int userId);
 
-    Task getTaskById(@Param("taskId") int taskId, @Param("userId") int userId);
+    Task getTaskById(@Param("taskId") int taskId, @Param("userId") Integer userId);
 
     int createTask(@Param("task") Task task, @Param("userId") int userId);
 
