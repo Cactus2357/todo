@@ -90,10 +90,17 @@ create table task (
     updated_by VARCHAR(255)
 );
 
-create table user_task (
-    user_id int,
+create table task_relation (
     task_id int,
-    primary key (user_id, task_id)
+    user_id int null,
+    group_id int null,
+    note TEXT,
+    delete_flg INT NOT NULL DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(255),
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by VARCHAR(255),
+    unique key (task_id, user_id, group_id)
 );
 
 create table status (

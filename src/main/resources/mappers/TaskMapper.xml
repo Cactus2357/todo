@@ -4,23 +4,31 @@
     <select id="getAllTasksByUserId" resultType="com.example.demo.model.Task">
         SELECT t.task_id, t.parent_task_id, t.title, t.content, t.start_date, t.end_date, t.status
         FROM task t
-                 LEFT JOIN user_task ut on t.task_id = ut.task_id
-        WHERE ut.user_id = #{userId}
+                 LEFT JOIN task_relation tr on t.task_id = tr.task_id
+        WHERE tr.user_id = #{userId}
     </select>
+
     <select id="getTaskById" resultType="com.example.demo.model.Task">
         SELECT t.task_id, t.parent_task_id, t.title, t.content, t.start_date, t.end_date, t.status
         FROM task t
-        LEFT JOIN user_task ut on t.task_id = ut.task_id
+        LEFT JOIN task_relation tr on t.task_id = tr.task_id
         WHERE t.task_id = #{taskId}
         <if test="userId != null">
-            AND ut.user_id = #{userId}
+            AND tr.user_id = #{userId}
         </if>
     </select>
-    <insert id="createTask">
+
+    <insert id="insertTask" useGeneratedKeys="true" keyProperty="task.taskId">
         INSERT INTO task (parent_task_id, title, content, start_date, end_date, status, created_by)
         VALUES (#{task.parentTaskId}, #{task.title}, #{task.content}, #{task.startDate}, #{task.endDate},
-                #{task.status}, #{userId})
+                #{task.status}, #{userId});
     </insert>
+
+    <insert id="insertTaskRelation">
+        INSERT INTO task_relation (task_id, user_id, group_id)
+        VALUES (#{taskId}, #{userId}, #{groupId})
+    </insert>
+
     <update id="updateTask">
         UPDATE task
         SET parent_task_id = #{task.parentTaskId},
@@ -28,15 +36,18 @@
             content        = #{task.content},
             start_date     = #{task.startDate},
             end_date       = #{task.endDate},
+            status         = #{task.status},
             updated_by     = #{userId}
         WHERE task_id = #{task.taskId}
     </update>
+
     <update id="updateTaskStatus">
         UPDATE task
         SET status     = #{statusId},
             updated_by = #{userId}
         WHERE task_id = #{taskId}
     </update>
+
     <update id="deleteTask">
         UPDATE task
         SET delete_flg = 1,

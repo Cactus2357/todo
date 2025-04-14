@@ -29,18 +29,23 @@ public class TaskDAO {
 
     public int createTask(Task task, int userId) {
         task.setStatus(Const.STATUS_TASK_PROGRESS);
-        return taskMapper.createTask(task, userId);
+        taskMapper.insertTask(task, userId);
+        taskMapper.insertTaskRelation(task.getTaskId(), userId, null);
+        return task.getTaskId();
     }
 
     public int updateTask(Task task, int userId) {
-        return taskMapper.updateTask(task, userId);
+        taskMapper.updateTask(task, userId);
+        return task.getTaskId();
     }
 
     public int deleteTask(int taskId, int userId) {
-        return taskMapper.deleteTask(taskId, userId);
+        taskMapper.deleteTask(taskId, userId);
+        return taskId;
     }
 
     public int updateTaskStatus(int taskId, int taskStatus, int userId) {
-        return taskMapper.updateTaskStatus(taskId, taskStatus, userId);
+        taskMapper.updateTaskStatus(taskId, taskStatus, userId);
+        return taskId;
     }
 }

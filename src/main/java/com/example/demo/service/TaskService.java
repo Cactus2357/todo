@@ -38,37 +38,24 @@ public class TaskService {
     }
 
     public TaskResponse getTaskById(int taskId) {
-        SecurityContext context = SecurityContextHolder.getContext();
-        int userId = Integer.parseInt(context.getAuthentication().getName());
-        return toTaskResponse(taskDAO.getTaskById(taskId, userId));
+        Task task = taskDAO.getTaskById(taskId, UserService.getCurrentUserId());
+        return task == null ? null : toTaskResponse(task);
     }
 
     public List<TaskResponse> getAllTasks(int userId) {
         return taskDAO.getAllUserTasks(userId).stream().map(this::toTaskResponse).toList();
     }
 
-    public void createTask(CreateTaskRequest request) {
-        SecurityContext context = SecurityContextHolder.getContext();
-        int userId = Integer.parseInt(context.getAuthentication().getName());
-        taskDAO.createTask(toTask(request), userId);
+    public int createTask(CreateTaskRequest request) {
+        return taskDAO.createTask(toTask(request), UserService.getCurrentUserId());
     }
 
-    public void updateTask(UpdateTaskRequest request) {
-        SecurityContext context = SecurityContextHolder.getContext();
-        int userId = Integer.parseInt(context.getAuthentication().getName());
-        taskDAO.updateTask(toTask(request), userId);
+    public int updateTask(UpdateTaskRequest request) {
+        return taskDAO.updateTask(toTask(request), UserService.getCurrentUserId());
     }
 
-    public void deleteTask(int taskId) {
-        SecurityContext context = SecurityContextHolder.getContext();
-        int userId = Integer.parseInt(context.getAuthentication().getName());
-        taskDAO.deleteTask(taskId, userId);
-    }
-
-    public void updateTaskStatus(int taskId, int statusId) {
-        SecurityContext context = SecurityContextHolder.getContext();
-        int userId = Integer.parseInt(context.getAuthentication().getName());
-        taskDAO.updateTaskStatus(taskId, statusId, userId);
+    public int deleteTask(int taskId) {
+        return taskDAO.deleteTask(taskId, UserService.getCurrentUserId());
     }
 
     private Task toTask(@NotNull CreateTaskRequest request) {
@@ -89,6 +76,7 @@ public class TaskService {
                 .parentTaskId(request.getParentTaskId())
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
+                .status(request.getStatus())
                 .build();
     }
 

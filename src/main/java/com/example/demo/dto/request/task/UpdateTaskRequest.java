@@ -17,4 +17,5 @@ public class UpdateTaskRequest {
     String content;
     LocalDateTime startDate;
     LocalDateTime endDate;
+    int status;
 }
