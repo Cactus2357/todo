@@ -1,16 +1,11 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.request.CreateUserRequest;
-import com.example.demo.dto.request.UpdateUserRequest;
 import com.example.demo.dto.request.task.CreateTaskRequest;
 import com.example.demo.dto.request.task.UpdateTaskRequest;
-import com.example.demo.dto.response.ApiResponse;
-import com.example.demo.dto.response.UserResponse;
 import com.example.demo.dto.response.task.TaskResponse;
 import com.example.demo.service.TaskService;
 import com.example.demo.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +24,7 @@ public class TaskController {
 
     @GetMapping
     ResponseEntity<List<TaskResponse>> getAllTasks() {
-        return ResponseEntity.ok(taskService.getAllTasks(UserService.getCurrentUserId()));
+        return ResponseEntity.ok(taskService.getAllUserTasks(UserService.getCurrentUserId()));
     }
 
     @GetMapping("/{taskId}")

@@ -15,16 +15,16 @@ public class TaskDAO {
         this.taskMapper = taskMapper;
     }
 
-    public List<Task> getAllUserTasks(int userId) {
-        return taskMapper.getAllTasksByUserId(userId);
+    public List<Task> getAllUserTasks(Integer userId, Integer groupId) {
+        return taskMapper.getAllTasksByUserId(userId, groupId);
     }
 
     public Task getTaskById(int taskId, int userId) {
         return taskMapper.getTaskById(taskId, userId);
     }
 
-    public Task getTaskById(int taskId) {
-        return taskMapper.getTaskById(taskId, null);
+    public Task getTaskById(int taskId, Integer userId) {
+        return taskMapper.getTaskById(taskId, userId);
     }
 
     public int createTask(Task task, int userId) {

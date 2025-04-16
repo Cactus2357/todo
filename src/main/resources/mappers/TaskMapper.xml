@@ -4,8 +4,12 @@
     <select id="getAllTasksByUserId" resultType="com.example.demo.model.Task">
         SELECT t.task_id, t.parent_task_id, t.title, t.content, t.start_date, t.end_date, t.status
         FROM task t
-                 LEFT JOIN task_relation tr on t.task_id = tr.task_id
-        WHERE tr.user_id = #{userId}
+        LEFT JOIN task_relation tr on t.task_id = tr.task_id
+        <where>
+            1 = 1
+            <if test="userId != null">AND tr.user_id = #{userId}</if>
+            <if test="groupId != null">AND tr.group_id = #{groupId}</if>
+        </where>
     </select>
 
     <select id="getTaskById" resultType="com.example.demo.model.Task">

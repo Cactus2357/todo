@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface TaskMapper {
-    List<Task> getAllTasksByUserId(@Param("userId") int userId);
+    List<Task> getAllTasksByUserId(@Nullable @Param("userId") Integer userId, @Nullable @Param("groupId") Integer groupId);
 
     Task getTaskById(@Param("taskId") int taskId, @Param("userId") Integer userId);
 

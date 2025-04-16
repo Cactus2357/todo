@@ -1,30 +1,15 @@
 package com.example.demo.service;
 
-import com.example.demo.dao.RoleDAO;
 import com.example.demo.dao.TaskDAO;
-import com.example.demo.dao.UserDAO;
-import com.example.demo.dto.request.CreateUserRequest;
-import com.example.demo.dto.request.UpdateUserRequest;
 import com.example.demo.dto.request.task.CreateTaskRequest;
 import com.example.demo.dto.request.task.UpdateTaskRequest;
-import com.example.demo.dto.response.UserResponse;
 import com.example.demo.dto.response.task.TaskResponse;
-import com.example.demo.enums.RoleEnum;
-import com.example.demo.exception.AppException;
-import com.example.demo.exception.ErrorCode;
 import com.example.demo.model.Task;
-import com.example.demo.model.User;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -42,8 +27,12 @@ public class TaskService {
         return task == null ? null : toTaskResponse(task);
     }
 
-    public List<TaskResponse> getAllTasks(int userId) {
-        return taskDAO.getAllUserTasks(userId).stream().map(this::toTaskResponse).toList();
+    public List<TaskResponse> getAllUserTasks(int userId) {
+        return taskDAO.getAllUserTasks(userId, null).stream().map(this::toTaskResponse).toList();
+    }
+
+    public List<TaskResponse> getAllGroupTasks(int groupId) {
+        return taskDAO.getAllUserTasks(null, groupId).stream().map(this::toTaskResponse).toList();
     }
 
     public int createTask(CreateTaskRequest request) {
