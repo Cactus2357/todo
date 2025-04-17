@@ -23,30 +23,34 @@ import java.text.ParseException;
 public class AuthenticationController {
     private AuthenticationService authenticationService;
 
+    public static final String MSG_AUTH_SUCCESS = "Authentication successful";
+    public static final String MSG_TOKEN_VALIDATED = "Token validated successfully";
+    public static final String MSG_TOKEN_REFRESHED = "Token refreshed successfully";
+    public static final String MSG_LOGOUT_SUCCESS = "Logout successful";
+
     public AuthenticationController(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
 
     @PostMapping("/token")
     ResponseEntity<ApiResponse<AuthenticationResponse>> authenticate(@RequestBody AuthenticationRequest request) {
-        return ResponseEntity.ok(ApiResponse.<AuthenticationResponse>builder().data(authenticationService.authenticate(request)).build());
+        return ResponseEntity.ok(ApiResponse.success(MSG_AUTH_SUCCESS, authenticationService.authenticate(request)));
     }
 
     @PostMapping("/validate")
     ResponseEntity<ApiResponse<ValidateTokenResponse>> validate(@RequestBody TokenRequest request) throws ParseException, JOSEException {
-        return ResponseEntity.ok(ApiResponse.<ValidateTokenResponse>builder().data(authenticationService.validateToken(request)).build());
+        return ResponseEntity.ok(ApiResponse.success(MSG_TOKEN_VALIDATED, authenticationService.validateToken(request)));
     }
 
     @PostMapping("/refresh")
     ResponseEntity<ApiResponse<AuthenticationResponse>> refreshToken(@RequestBody TokenRequest request) throws ParseException, JOSEException {
-        AuthenticationResponse response = authenticationService.refreshToken(request);
-        return ResponseEntity.ok(ApiResponse.<AuthenticationResponse>builder().data(response).build());
+        return ResponseEntity.ok(ApiResponse.success(MSG_TOKEN_REFRESHED, authenticationService.refreshToken(request)));
     }
 
     @PostMapping("/logout")
-    ResponseEntity<ApiResponse<Void>> logout(@RequestBody TokenRequest request) throws ParseException, JOSEException {
+    ResponseEntity<ApiResponse<?>> logout(@RequestBody TokenRequest request) throws ParseException, JOSEException {
         authenticationService.logout(request);
-        return ResponseEntity.ok(ApiResponse.<Void>builder().build());
+        return ResponseEntity.ok(ApiResponse.success(MSG_LOGOUT_SUCCESS, null));
     }
 
 
