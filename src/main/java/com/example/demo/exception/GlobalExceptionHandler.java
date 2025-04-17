@@ -5,17 +5,20 @@ import jakarta.validation.ConstraintViolation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+    private static final String MSG_VALIDATION_ERROR = "Validation error";
 
     @ExceptionHandler(Exception.class)
     ResponseEntity<ApiResponse<?>> handlingRuntimeException(Exception ex) {
@@ -35,24 +38,21 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     ResponseEntity<ApiResponse<?>> handlingException(MethodArgumentNotValidException ex) {
-        ErrorCode errorCode = ErrorCode.UNCATEGORIZED;
-        Map<String, Object> attributes = null;
+        ErrorCode errorCode = ErrorCode.VALIDATION_ERROR;
 
-        try {
-            errorCode = ErrorCode.valueOf(ex.getBindingResult().getFieldError().getDefaultMessage());
+        Map<String, String> errors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        fieldError -> Optional.ofNullable(fieldError.getDefaultMessage()).orElse("Invalid value"),
+                        (existing, replacement) -> existing,
+                        LinkedHashMap::new
+                ));
 
-            var constraintViolations = ex.getBindingResult().getAllErrors().getFirst()
-                    .unwrap(ConstraintViolation.class);
+        ApiResponse<?> response = ApiResponse.error(errorCode.getMessage(), String.valueOf(errorCode.getCode()), errors);
 
-            attributes = constraintViolations.getConstraintDescriptor().getAttributes();
-
-        } catch (IllegalArgumentException ignored) {
-        }
-
-        String message = Objects.nonNull(attributes) ? mapMessage(errorCode.getMessage(), attributes) : errorCode.getMessage();
-
-        return ResponseEntity.badRequest().body(ApiResponse.error(message, String.valueOf(errorCode.getCode())));
-
+        return ResponseEntity.badRequest().body(response);
     }
 
     private String mapMessage(String message, Map<String, Object> attributes) {
