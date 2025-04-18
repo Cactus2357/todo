@@ -20,8 +20,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -79,6 +81,15 @@ public class UserService {
         return userList.stream().map(this::toUserResponse).toList();
     }
 
+    public List<UserResponse> searchUsers(String query) {
+        String[] queries = null;
+        if (query != null && !query.isBlank()) {
+            queries = query.trim().split("\\s+");
+        }
+
+        return userDAO.findAll(queries).stream().map(this::toUserResponse).toList();
+    }
+
     public UserResponse getCurrentUser() {
         User user = userDAO.getUserById(getCurrentUserId());
 
@@ -90,11 +101,10 @@ public class UserService {
     }
 
     @Transactional
-    @PostAuthorize("returnObject.userId == authentication.name")
-    public UserResponse updateUser(int userId, UpdateUserRequest request) {
+    public UserResponse updateUser(UpdateUserRequest request) {
 
         User user = toUser(request);
-        user.setUserId(userId);
+        user.setUserId(getCurrentUserId());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         userDAO.updateUser(user);
@@ -105,6 +115,10 @@ public class UserService {
     @PreAuthorize("hasRole('admin')")
     public int deleteUser(int userId) {
         return userDAO.deleteUser(userId);
+    }
+
+    public int deleteCurrentUser() {
+        return userDAO.deleteUser(getCurrentUserId());
     }
 
     private User toUser(@NonNull CreateUserRequest request) {

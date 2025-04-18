@@ -7,6 +7,8 @@ import java.util.List;
 public interface UserMapper {
     List<User> getAllUsers();
 
+    List<User> searchUser(String[] keywords);
+
     int createUser(User user);
 
     User getUserById(Integer userId);
@@ -14,7 +16,6 @@ public interface UserMapper {
     User getUserByUsername(String username);
 
     User getUserByEmail(String email);
-
 
     int updateUser(User user);
 

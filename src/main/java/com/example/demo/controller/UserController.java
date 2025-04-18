@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    final
-    UserService userService;
+    private final UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -24,32 +23,38 @@ public class UserController {
 
     @PostMapping
     ResponseEntity<ApiResponse<UserResponse>> createUser(@RequestBody CreateUserRequest request) {
-        return ResponseEntity.ok(ApiResponse.<UserResponse>builder().data(userService.createUser(request)).build());
+        return ResponseEntity.ok(ApiResponse.success("User created successfully", userService.createUser(request)));
     }
 
     @GetMapping
-    ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
-        return ResponseEntity.ok(ApiResponse.<List<UserResponse>>builder().data(userService.getAllUsers()).build());
+    ResponseEntity<ApiResponse<List<UserResponse>>> searchUsers(@RequestParam(name = "query", required = false) String query) {
+        return ResponseEntity.ok(ApiResponse.success("Users fetched successfully", userService.searchUsers(query)));
     }
 
     @GetMapping("/{userId}")
     ResponseEntity<ApiResponse<UserResponse>> getUserById(@PathVariable("userId") int userId) {
-        return ResponseEntity.ok(ApiResponse.<UserResponse>builder().data(userService.getUserById(userId)).build());
+        return ResponseEntity.ok(ApiResponse.success("User fetched successfully", userService.getUserById(userId)));
     }
 
-    @GetMapping("/profile")
+    @GetMapping("/me")
     ResponseEntity<ApiResponse<UserResponse>> getUserProfile() {
-        return ResponseEntity.ok(ApiResponse.<UserResponse>builder().data(userService.getCurrentUser()).build());
+        return ResponseEntity.ok(ApiResponse.success("Current user fetched successfully", userService.getCurrentUser()));
     }
 
-    @PutMapping("/{userId}")
-    ResponseEntity<ApiResponse<UserResponse>> updateUser(@PathVariable("userId") int userId, @RequestBody UpdateUserRequest request) {
-        return ResponseEntity.ok(ApiResponse.<UserResponse>builder().data(userService.updateUser(userId, request)).build());
+    @PutMapping("/me")
+    ResponseEntity<ApiResponse<UserResponse>> updateUserProfile(@RequestBody UpdateUserRequest request) {
+        return ResponseEntity.ok(ApiResponse.success("User updated successfully", userService.updateUser(request)));
+    }
+
+    @DeleteMapping("/me")
+    ResponseEntity<ApiResponse<String>> deleteCurrentUser() {
+        userService.deleteCurrentUser();
+        return ResponseEntity.ok(ApiResponse.success("User deleted successfully", null));
     }
 
     @DeleteMapping("/{userId}")
     ResponseEntity<ApiResponse<String>> deleteUser(@PathVariable("userId") int userId) {
-//        userService
-        return ResponseEntity.ok(ApiResponse.<String>builder().build());
+        userService.deleteUser(userId);
+        return ResponseEntity.ok(ApiResponse.success("User deleted successfully", null));
     }
 }

@@ -108,4 +108,28 @@
         WHERE delete_flg = 0
         AND (username = #{username} OR email = #{email})
     </select>
+    <select id="searchUser" resultType="com.example.demo.model.User">
+        SELECT user_id,
+        username,
+        email,
+        password,
+        display_name,
+        avatar,
+        description,
+        status,
+        created_at,
+        created_by,
+        updated_at,
+        updated_by
+        FROM user
+        WHERE delete_flg = 0
+        <if test="keywords != null and keywords.length > 0">
+            AND
+            <foreach collection="keywords" item="keyword" separator="OR" open="(" close=")">
+                username LIKE CONCAT('%', #{keyword}, '%')
+                OR display_name LIKE CONCAT('%', #{keyword}, '%')
+            </foreach>
+        </if>
+        LIMIT 1000
+    </select>
 </mapper>

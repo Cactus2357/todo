@@ -15,7 +15,11 @@ public class UserDAO {
     }
 
     public List<User> findAll() {
-        return userMapper.getAllUsers();
+        return findAll(null);
+    }
+
+    public List<User> findAll(String[] queries) {
+        return userMapper.searchUser(queries);
     }
 
     public int createUser(User user) {
