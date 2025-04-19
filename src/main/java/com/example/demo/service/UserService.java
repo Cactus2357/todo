@@ -50,7 +50,7 @@ public class UserService {
     @Transactional
     public UserResponse createUser(CreateUserRequest request) {
 
-        boolean userExisted = userDAO.existUser(request.getUsername(), request.getUsername());
+        boolean userExisted = userDAO.existUser(request.getUsername(), request.getEmail());
 
         if (userExisted) {
             throw new AppException(ErrorCode.USER_EXISTED);
