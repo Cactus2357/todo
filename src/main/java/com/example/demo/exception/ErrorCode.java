@@ -12,8 +12,10 @@ public enum ErrorCode {
     UNAUTHENTICATED(1000, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1001, "Unauthorized", HttpStatus.FORBIDDEN),
 
-    USER_EXISTED(1002, "User already exists", HttpStatus.BAD_REQUEST),
-    USER_NOT_FOUND(1003, "User not found", HttpStatus.NOT_FOUND),
+    VALIDATION_ERROR(1002, "Validation error", HttpStatus.BAD_REQUEST),
+
+    USER_EXISTED(1003, "User already exists", HttpStatus.BAD_REQUEST),
+    USER_NOT_FOUND(1004, "User not found", HttpStatus.NOT_FOUND),
     ;
 
     private final int code;
