@@ -71,4 +71,6 @@ public class GlobalExceptionHandler {
         return message;
     }
 
+    // TODO: handle HttpMessageNotReadableException invalid JSON format
+
 }

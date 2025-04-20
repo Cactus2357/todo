@@ -7,6 +7,7 @@ import com.example.demo.dto.response.AuthenticationResponse;
 import com.example.demo.dto.response.ValidateTokenResponse;
 import com.example.demo.service.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
@@ -33,22 +34,22 @@ public class AuthenticationController {
     }
 
     @PostMapping("/token")
-    ResponseEntity<ApiResponse<AuthenticationResponse>> authenticate(@RequestBody AuthenticationRequest request) {
+    ResponseEntity<ApiResponse<AuthenticationResponse>> authenticate(@Valid @RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(ApiResponse.success(MSG_AUTH_SUCCESS, authenticationService.authenticate(request)));
     }
 
     @PostMapping("/validate")
-    ResponseEntity<ApiResponse<ValidateTokenResponse>> validate(@RequestBody TokenRequest request) throws ParseException, JOSEException {
+    ResponseEntity<ApiResponse<ValidateTokenResponse>> validate(@Valid @RequestBody TokenRequest request) throws ParseException, JOSEException {
         return ResponseEntity.ok(ApiResponse.success(MSG_TOKEN_VALIDATED, authenticationService.validateToken(request)));
     }
 
     @PostMapping("/refresh")
-    ResponseEntity<ApiResponse<AuthenticationResponse>> refreshToken(@RequestBody TokenRequest request) throws ParseException, JOSEException {
+    ResponseEntity<ApiResponse<AuthenticationResponse>> refreshToken(@Valid @RequestBody TokenRequest request) throws ParseException, JOSEException {
         return ResponseEntity.ok(ApiResponse.success(MSG_TOKEN_REFRESHED, authenticationService.refreshToken(request)));
     }
 
     @PostMapping("/logout")
-    ResponseEntity<ApiResponse<?>> logout(@RequestBody TokenRequest request) throws ParseException, JOSEException {
+    ResponseEntity<ApiResponse<?>> logout(@Valid @RequestBody TokenRequest request) throws ParseException, JOSEException {
         authenticationService.logout(request);
         return ResponseEntity.ok(ApiResponse.success(MSG_LOGOUT_SUCCESS, null));
     }

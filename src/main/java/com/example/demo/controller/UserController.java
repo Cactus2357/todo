@@ -5,6 +5,7 @@ import com.example.demo.dto.request.UpdateUserRequest;
 import com.example.demo.dto.response.ApiResponse;
 import com.example.demo.dto.response.UserResponse;
 import com.example.demo.service.UserService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class UserController {
     }
 
     @PostMapping
-    ResponseEntity<ApiResponse<UserResponse>> createUser(@RequestBody CreateUserRequest request) {
+    ResponseEntity<ApiResponse<UserResponse>> createUser(@Valid @RequestBody CreateUserRequest request) {
         return ResponseEntity.ok(ApiResponse.success("User created successfully", userService.createUser(request)));
     }
 
@@ -42,7 +43,7 @@ public class UserController {
     }
 
     @PutMapping("/me")
-    ResponseEntity<ApiResponse<UserResponse>> updateUserProfile(@RequestBody UpdateUserRequest request) {
+    ResponseEntity<ApiResponse<UserResponse>> updateUserProfile(@Valid @RequestBody UpdateUserRequest request) {
         return ResponseEntity.ok(ApiResponse.success("User updated successfully", userService.updateUser(request)));
     }
 

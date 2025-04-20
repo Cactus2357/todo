@@ -60,8 +60,8 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        roleDAO.updateUserRole(user.getUserId(), RoleEnum.USER.getRoleId());
         int rows = userDAO.createUser(user);
+        roleDAO.updateUserRole(user.getUserId(), RoleEnum.USER.getRoleId());
 
         if (rows == 1) {
             user = userDAO.getUserById(user.getUserId());
@@ -73,6 +73,9 @@ public class UserService {
 
     public UserResponse getUserById(int userId) {
         User user = userDAO.getUserById(userId);
+        if (user == null) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
         return toUserResponse(user);
     }
 
@@ -105,7 +108,6 @@ public class UserService {
 
         User user = toUser(request);
         user.setUserId(getCurrentUserId());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         userDAO.updateUser(user);
 
@@ -122,37 +124,33 @@ public class UserService {
     }
 
     private User toUser(@NonNull CreateUserRequest request) {
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
-        user.setDisplayName(request.getDisplayName());
-        return user;
+        return User.builder()
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .password(request.getPassword())
+                .displayName(request.getDisplayName())
+                .build();
     }
 
     private User toUser(@NonNull UpdateUserRequest request) {
-        User user = new User();
-        user.setUserId(request.getUserId());
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
-        user.setDisplayName(request.getDisplayName());
-        user.setAvatar(request.getAvatar());
-        user.setDescription(request.getDescription());
-        user.setStatus(request.getStatus());
-        return user;
+        return User.builder()
+                .displayName(request.getDisplayName())
+                .avatar(request.getAvatar())
+                .description(request.getDescription())
+                .status(request.getStatus())
+                .build();
     }
 
     private UserResponse toUserResponse(@NonNull User user) {
-        return new UserResponse(
-                user.getUserId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getDisplayName(),
-                user.getAvatar(),
-                user.getDescription(),
-                user.getStatus(),
-                user.getCreatedAt()
-        );
+        return UserResponse.builder()
+                .userId(user.getUserId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .displayName(user.getDisplayName())
+                .avatar(user.getAvatar())
+                .description(user.getDescription())
+                .status(user.getStatus())
+                .createdAt(user.getCreatedAt())
+                .build();
     }
 }
