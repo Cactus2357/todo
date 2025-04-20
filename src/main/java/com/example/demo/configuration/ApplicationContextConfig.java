@@ -59,6 +59,7 @@ public class ApplicationContextConfig {
                 .email(ADMIN_EMAIL)
                 .password(passwordEncoder.encode(ADMIN_PASSWORD))
                 .displayName(ADMIN_DISPLAY_NAME)
+
                 .build();
 
         userDAO.createUser(user);

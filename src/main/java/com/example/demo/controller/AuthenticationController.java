@@ -54,5 +54,6 @@ public class AuthenticationController {
         return ResponseEntity.ok(ApiResponse.success(MSG_LOGOUT_SUCCESS, null));
     }
 
+    // TODO: add update authentication (username, password, email)
 
 }

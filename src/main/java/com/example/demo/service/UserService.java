@@ -2,8 +2,8 @@ package com.example.demo.service;
 
 import com.example.demo.dao.RoleDAO;
 import com.example.demo.dao.UserDAO;
-import com.example.demo.dto.request.CreateUserRequest;
-import com.example.demo.dto.request.UpdateUserRequest;
+import com.example.demo.dto.request.UserCreateRequest;
+import com.example.demo.dto.request.UserUpdateRequest;
 import com.example.demo.dto.response.UserResponse;
 import com.example.demo.enums.RoleEnum;
 import com.example.demo.exception.AppException;
@@ -13,17 +13,13 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -48,7 +44,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse createUser(CreateUserRequest request) {
+    public UserResponse createUser(UserCreateRequest request) {
 
         boolean userExisted = userDAO.existUser(request.getUsername(), request.getEmail());
 
@@ -104,7 +100,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse updateUser(UpdateUserRequest request) {
+    public UserResponse updateUser(UserUpdateRequest request) {
 
         User user = toUser(request);
         user.setUserId(getCurrentUserId());
@@ -123,7 +119,7 @@ public class UserService {
         return userDAO.deleteUser(getCurrentUserId());
     }
 
-    private User toUser(@NonNull CreateUserRequest request) {
+    private User toUser(@NonNull UserCreateRequest request) {
         return User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
@@ -132,7 +128,7 @@ public class UserService {
                 .build();
     }
 
-    private User toUser(@NonNull UpdateUserRequest request) {
+    private User toUser(@NonNull UserUpdateRequest request) {
         return User.builder()
                 .displayName(request.getDisplayName())
                 .avatar(request.getAvatar())

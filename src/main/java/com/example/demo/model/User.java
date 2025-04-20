@@ -10,16 +10,16 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
-    int userId;
+    Integer userId;
     String username;
     String email;
     String password;
     String displayName;
     String avatar;
     String description;
-    int status;
+    Integer status;
     String note;
-    int deleteFlg;
+    Integer deleteFlg;
     LocalDateTime createdAt;
     String createdBy;
     LocalDateTime updatedAt;

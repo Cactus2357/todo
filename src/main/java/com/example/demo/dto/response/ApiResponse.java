@@ -60,7 +60,7 @@ public class ApiResponse<T> {
     }
 
     public static <T> ApiResponse<T> error(ErrorCode errorCode, T data) {
-        return error(errorCode.getMessage(), String.valueOf(errorCode.getCode()), data);
+        return error(errorCode.getMessage(), errorCode.getCode(), data);
     }
 
     public static <T> ApiResponse<T> error(String message, String errorCode) {

@@ -5,11 +5,15 @@ import jakarta.validation.ConstraintViolation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,6 +59,22 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    ResponseEntity<ApiResponse<Void>> handleBadJson(HttpMessageNotReadableException ex) {
+        ErrorCode errorCode = ErrorCode.INVALID_JSON;
+        return ResponseEntity.badRequest().body(ApiResponse.error(errorCode.getMessage(), errorCode.getCode()));
+    }
+
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler({NoHandlerFoundException.class, NoResourceFoundException.class, HttpRequestMethodNotSupportedException.class})
+    ResponseEntity<ApiResponse<Void>> handleNotFound(HttpMessageNotReadableException ex) {
+        ErrorCode errorCode = ErrorCode.UNCATEGORIZED;
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(errorCode));
+    }
+
+
     private String mapMessage(String message, Map<String, Object> attributes) {
         if (message == null || attributes == null)
             return message;
@@ -70,7 +90,5 @@ public class GlobalExceptionHandler {
 
         return message;
     }
-
-    // TODO: handle HttpMessageNotReadableException invalid JSON format
 
 }

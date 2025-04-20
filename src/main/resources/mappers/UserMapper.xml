@@ -7,15 +7,12 @@
     </insert>
     <update id="updateUser" parameterType="com.example.demo.model.User">
         UPDATE user
-        SET username    = #{username},
-            email       = #{email},
-            password    = #{password},
-            display_name= #{displayName},
-            avatar      = #{avatar},
-            description = #{description},
-            status      = #{status}
+        SET display_name = #{displayName},
+            avatar       = #{avatar},
+            description  = #{description},
+            status       = #{status}
         WHERE user_id = #{userId}
-          AND (delete_flg = 0)
+          AND delete_flg = 0
     </update>
     <update id="deleteUser">
         UPDATE user
