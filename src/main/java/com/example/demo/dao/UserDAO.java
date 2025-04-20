@@ -23,7 +23,8 @@ public class UserDAO {
     }
 
     public int createUser(User user) {
-        return userMapper.createUser(user);
+        userMapper.createUser(user);
+        return user.getUserId();
     }
 
     public User getUserById(int userId) {
@@ -39,11 +40,13 @@ public class UserDAO {
     }
 
     public int updateUser(User user) {
-        return userMapper.updateUser(user);
+        userMapper.updateUser(user);
+        return user.getUserId();
     }
 
     public int deleteUser(int userId) {
-        return userMapper.deleteUser(userId);
+        userMapper.deleteUser(userId);
+        return userId;
     }
 
     public boolean existUser(String username, String email) {

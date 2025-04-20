@@ -23,8 +23,7 @@ mybatis:
     auto-mapping-behavior: full
     call-setters-on-nulls: true
     map-underscore-to-camel-case: true
-
-
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 ###
 jwt:
   signerKey: "1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij"
