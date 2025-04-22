@@ -12,6 +12,9 @@ spring:
     password: ${DBMS_PASSWORD:123456}
   application:
     name: demo
+  web:
+    resources:
+      add-mappings: false
 
 ###
 mybatis:

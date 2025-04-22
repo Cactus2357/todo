@@ -3,6 +3,7 @@ package com.example.demo.dto.request;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.URL;
 
 @Data

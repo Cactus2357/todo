@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.constant.Const;
 import com.example.demo.dao.RoleDAO;
 import com.example.demo.dao.UserDAO;
 import com.example.demo.dto.request.UserCreateRequest;
@@ -45,16 +46,14 @@ public class UserService {
 
     @Transactional
     public UserResponse createUser(UserCreateRequest request) {
-
         boolean userExisted = userDAO.existUser(request.getUsername(), request.getEmail());
-
         if (userExisted) {
             throw new AppException(ErrorCode.USER_EXISTED);
         }
 
         User user = toUser(request);
-
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setStatus(Const.STATUS_USER_ACTIVE);
 
         int rows = userDAO.createUser(user);
         roleDAO.updateUserRole(user.getUserId(), RoleEnum.USER.getRoleId());
@@ -72,6 +71,7 @@ public class UserService {
         if (user == null) {
             throw new AppException(ErrorCode.USER_NOT_FOUND);
         }
+
         return toUserResponse(user);
     }
 
@@ -91,7 +91,6 @@ public class UserService {
 
     public UserResponse getCurrentUser() {
         User user = userDAO.getUserById(getCurrentUserId());
-
         if (user == null) {
             throw new AppException(ErrorCode.USER_NOT_FOUND);
         }
@@ -101,10 +100,8 @@ public class UserService {
 
     @Transactional
     public UserResponse updateUser(UserUpdateRequest request) {
-
         User user = toUser(request);
         user.setUserId(getCurrentUserId());
-
         userDAO.updateUser(user);
 
         return getUserById(user.getUserId());

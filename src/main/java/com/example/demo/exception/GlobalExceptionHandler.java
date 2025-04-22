@@ -12,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -22,20 +23,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    private static final String MSG_VALIDATION_ERROR = "Validation error";
-
     @ExceptionHandler(Exception.class)
     ResponseEntity<ApiResponse<?>> handlingRuntimeException(Exception ex) {
         log.error(ex.getMessage(), ex);
-        ErrorCode errorCode = ErrorCode.UNCATEGORIZED;
-
-        return ResponseEntity.internalServerError().body(ApiResponse.error(errorCode));
+        return ResponseEntity.internalServerError().body(ApiResponse.error(ErrorCode.UNCATEGORIZED));
     }
 
     @ExceptionHandler(AppException.class)
     ResponseEntity<ApiResponse<?>> handlingAppException(AppException ex) {
         ErrorCode errorCode = ex.getErrorCode();
-
         return ResponseEntity.status(errorCode.getStatusCode()).body(ApiResponse.error(errorCode));
     }
 
@@ -49,7 +45,20 @@ public class GlobalExceptionHandler {
                 .stream()
                 .collect(Collectors.toMap(
                         FieldError::getField,
-                        fieldError -> Optional.ofNullable(fieldError.getDefaultMessage()).orElse("Invalid value"),
+                        fieldError -> {
+                            String message = fieldError.getDefaultMessage();
+                            ConstraintViolation<?> violation = null;
+
+                            try {
+                                violation = fieldError.unwrap(ConstraintViolation.class);
+                            } catch (Exception ignored) {}
+
+                            if (violation != null) {
+                                return mapMessage(message, violation.getConstraintDescriptor().getAttributes());
+                            }
+
+                            return message != null ? message : "Invalid value";
+                        },
                         (existing, replacement) -> existing,
                         LinkedHashMap::new
                 ));
@@ -62,16 +71,25 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ResponseEntity<ApiResponse<Void>> handleBadJson(HttpMessageNotReadableException ex) {
-        ErrorCode errorCode = ErrorCode.INVALID_JSON;
-        return ResponseEntity.badRequest().body(ApiResponse.error(errorCode.getMessage(), errorCode.getCode()));
+        return ResponseEntity.badRequest().body(ApiResponse.error(ErrorCode.INVALID_JSON));
     }
 
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({NoHandlerFoundException.class, NoResourceFoundException.class, HttpRequestMethodNotSupportedException.class})
-    ResponseEntity<ApiResponse<Void>> handleNotFound(HttpMessageNotReadableException ex) {
-        ErrorCode errorCode = ErrorCode.UNCATEGORIZED;
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(errorCode));
+    @ExceptionHandler({
+            NoHandlerFoundException.class,
+            NoResourceFoundException.class,
+            HttpRequestMethodNotSupportedException.class
+    })
+    public ResponseEntity<ApiResponse<Void>> handleNotFound(Exception ex) {
+        log.warn("Resource not found: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error(ErrorCode.NOT_FOUND));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.error(ErrorCode.INVALID_ARGUMENT_TYPE));
     }
 
 

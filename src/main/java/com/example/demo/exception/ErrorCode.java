@@ -15,6 +15,7 @@ public enum ErrorCode {
 
     INVALID_JSON("E1002", "Invalid or malformed JSON", HttpStatus.BAD_REQUEST),
     VALIDATION_ERROR("E1003", "Validation error", HttpStatus.BAD_REQUEST),
+    INVALID_ARGUMENT_TYPE("E1004", "Invalid parameter type", HttpStatus.BAD_REQUEST),
 
     USER_EXISTED("E2000", "User already exists", HttpStatus.BAD_REQUEST),
     USER_NOT_FOUND("E2001", "User not found", HttpStatus.NOT_FOUND),
